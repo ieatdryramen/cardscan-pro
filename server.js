@@ -33,4 +33,7 @@ app.post('/api/scan', async (req, res) => {
 });
 
 app.get('/health', (_, res) => res.json({ ok: true }));
-app.listen(PORT, () => console.log(`CardScan running on port ${PORT}`));
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`CardScan running on port ${PORT}`);
+});
