@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CardScan Pro — AI Lead Intelligence</title>
+<title>CardScan Pro â AI Lead Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -140,7 +140,7 @@ tbody tr:hover{background:#141414;}
 const S={profile:null,queue:[],contacts:[],view:'cards'};
 const FIELDS=[{k:'first_name',l:'First Name'},{k:'last_name',l:'Last Name'},{k:'title',l:'Title'},{k:'company',l:'Company'},{k:'email',l:'Email'},{k:'phone',l:'Phone'},{k:'mobile',l:'Mobile'},{k:'website',l:'Website'},{k:'linkedin',l:'LinkedIn'},{k:'address',l:'Address'},{k:'city',l:'City'},{k:'state',l:'State'},{k:'zip',l:'ZIP'},{k:'country',l:'Country'},{k:'notes',l:'Notes'},{k:'lead_score',l:'Score'},{k:'score_reason',l:'Reason'}];
 async function callAPI(messages){const r=await fetch('/api/scan',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Server error');const txt=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();if(!txt)throw new Error('Empty response');return txt;}
-function parseJSON(str){str=str.replace(/```json/gi,'').replace(/```/g,'').trim();const s=str.indexOf('{'),e=str.lastIndexOf('}');if(s<0||e<0)throw new Error('No JSON');return JSON.parse(str.slice(s,e+1));}
+function parseJSON(str){str=str.split('\n').filter(function(l){var t=l.trim();return t!=='```json'&&t!=='```'&&t!=='```';}).join('\n').trim();const s=str.indexOf('{'),e=str.lastIndexOf('}');if(s<0||e<0)throw new Error('No JSON');return JSON.parse(str.slice(s,e+1));}
 function goTab(n){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',['profile','scan','results'][i]===n));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('tab-'+n).classList.add('on');if(n==='scan')document.getElementById('noProfileWarn').style.display=S.profile?'none':'block';}
 async function analyzeWebsite(){const url=document.getElementById('websiteUrl').value.trim();if(!url)return toast('Enter a URL first','err');const btn=document.getElementById('analyzeBtn');btn.textContent='Analyzing...';btn.disabled=true;try{const txt=await callAPI([{role:'user',content:'Analyze this company and return ONLY JSON (no markdown):
 
