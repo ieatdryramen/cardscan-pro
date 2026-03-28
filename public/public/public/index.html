@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardScan Pro — AI Lead Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d0d0d;color:#f0ece4;font-family:'IBM Plex Sans',sans-serif;min-height:100vh;}
+header{display:flex;align-items:center;padding:16px 28px;border-bottom:1px solid #1e1e1e;background:#0d0d0d;position:sticky;top:0;z-index:50;gap:12px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;line-height:1;}
+.logo span{color:#e8c547;}
+.logo-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#555;letter-spacing:.2em;text-transform:uppercase;margin-top:2px;}
+.pills{margin-left:auto;display:flex;gap:8px;}
+.pill{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border:1px solid #2a2a2a;color:#555;}
+.pill.on{border-color:#e8c547;color:#e8c547;}
+.tabs{display:flex;border-bottom:1px solid #1e1e1e;padding:0 28px;}
+.tab{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:12px 16px;cursor:pointer;color:#444;border:none;border-bottom:2px solid transparent;background:none;transition:all .15s;}
+.tab:hover{color:#f0ece4;}
+.tab.on{color:#e8c547;border-bottom-color:#e8c547;}
+.panel{display:none;padding:28px;max-width:1000px;margin:0 auto;}
+.panel.on{display:block;}
+.sh{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:18px;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#555;}
+input[type=text],textarea{background:#141414;border:1px solid #2a2a2a;color:#f0ece4;font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;width:100%;transition:border-color .15s;}
+input[type=text]:focus,textarea:focus{border-color:#e8c547;}
+textarea{resize:vertical;min-height:68px;line-height:1.55;}
+.btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:10px 18px;border:1px solid #2a2a2a;background:transparent;color:#f0ece4;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn:hover{border-color:#f0ece4;}
+.btn:disabled{opacity:.25;cursor:not-allowed;}
+.btn.y{border-color:#e8c547;color:#e8c547;}
+.btn.y:hover{background:#e8c547;color:#0d0d0d;}
+.btn.g{border-color:#2ecc71;color:#2ecc71;}
+.btn.g:hover{background:#2ecc71;color:#0d0d0d;}
+.btn.r{border-color:#e74c3c;color:#e74c3c;}
+.btn.r:hover{background:#e74c3c;color:#fff;}
+.profile-active{display:none;padding:10px 14px;border:1px solid #2ecc71;background:rgba(46,204,113,.06);font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2ecc71;margin-bottom:16px;}
+.dz{border:1px dashed #2a2a2a;background:#141414;padding:48px 28px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:14px;}
+.dz:hover,.dz.over{border-color:#e8c547;background:rgba(232,197,71,.03);}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:6px;}
+.dz-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#444;}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;margin:12px 0;}
+.thumb{position:relative;aspect-ratio:3/2;overflow:hidden;border:1px solid #2a2a2a;}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.ts{position:absolute;bottom:0;left:0;right:0;font-family:'IBM Plex Mono',monospace;font-size:8px;text-transform:uppercase;padding:3px 4px;text-align:center;}
+.ts.pending{background:rgba(0,0,0,.8);color:#666;}
+.ts.processing{background:rgba(52,152,219,.9);color:#fff;animation:blink .8s infinite;}
+.ts.done{background:rgba(46,204,113,.9);color:#fff;}
+.ts.error{background:rgba(231,76,60,.9);color:#fff;}
+.tr{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.75);color:#fff;border:none;width:16px;height:16px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.prog{height:2px;background:#1e1e1e;display:none;margin:8px 0 12px;}
+.prog-bar{height:100%;background:#e8c547;transition:width .25s;width:0%;}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.warn{display:none;margin-top:10px;padding:9px 12px;border:1px solid rgba(232,197,71,.25);background:rgba(232,197,71,.04);font-family:'IBM Plex Mono',monospace;font-size:10px;color:#e8c547;}
+.warn a{color:#e8c547;cursor:pointer;text-decoration:underline;}
+.stats{display:none;border:1px solid #1e1e1e;margin-bottom:18px;}
+.stats-row{display:flex;}
+.stat{flex:1;padding:14px 18px;border-right:1px solid #1e1e1e;}
+.stat:last-child{border-right:none;}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;}
+.sl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#444;margin-top:2px;}
+.vtog{display:flex;border:1px solid #2a2a2a;}
+.vb{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:7px 12px;background:transparent;color:#444;cursor:pointer;border:none;border-right:1px solid #2a2a2a;transition:all .12s;}
+.vb:last-child{border-right:none;}
+.vb.on{background:#1a1a1a;color:#e8c547;}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+.cc{background:#141414;border:1px solid #222;padding:16px;}
+.cc-score{float:right;width:44px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #2a2a2a;margin-left:10px;}
+.cc-score-n{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;}
+.cc-score-l{font-family:'IBM Plex Mono',monospace;font-size:7px;color:#444;text-transform:uppercase;}
+.cc-score.h{border-color:#2ecc71}.cc-score.h .cc-score-n{color:#2ecc71;}
+.cc-score.w{border-color:#e8c547}.cc-score.w .cc-score-n{color:#e8c547;}
+.cc-score.c{border-color:#3498db}.cc-score.c .cc-score-n{color:#3498db;}
+.cc-score.l{border-color:#e74c3c}.cc-score.l .cc-score-n{color:#e74c3c;}
+.cc-name{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;margin-bottom:2px;}
+.cc-sub{font-size:11px;color:#555;margin-bottom:10px;}
+.reason{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;line-height:1.5;padding:6px 9px;background:#1a1a1a;border-left:2px solid #2a2a2a;margin-bottom:10px;font-style:italic;clear:both;}
+.cfields{display:grid;grid-template-columns:1fr 1fr;gap:5px;clear:both;}
+.cf{display:flex;flex-direction:column;gap:1px;}
+.cf.wide{grid-column:1/-1;}
+.fl{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#3a3a3a;}
+.fv{font-size:11px;color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tw{overflow-x:auto;border:1px solid #2a2a2a;}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:'IBM Plex Mono',monospace;}
+thead tr{background:#1a1a1a;}
+th{padding:9px 11px;text-align:left;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#444;border-bottom:1px solid #2a2a2a;white-space:nowrap;}
+td{padding:8px 11px;border-bottom:1px solid #161616;color:#ccc;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+tbody tr:hover{background:#141414;}
+.empty{text-align:center;padding:56px 20px;border:1px dashed #1e1e1e;color:#333;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
+.toast{position:fixed;bottom:18px;right:18px;background:#1a1a1a;border:1px solid #2a2a2a;color:#f0ece4;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:10px 14px;opacity:0;transform:translateY(4px);transition:all .2s;pointer-events:none;z-index:9999;max-width:280px;}
+.toast.on{opacity:1;transform:translateY(0);}
+.toast.ok{border-left:2px solid #2ecc71;}
+.toast.err{border-left:2px solid #e74c3c;}
+.disclaimer{margin-top:24px;padding:12px 14px;border:1px solid #1e1e1e;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#333;line-height:1.7;}
+.disclaimer strong{color:#444;}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="logo">CARD<span>SCAN</span> PRO</div><div class="logo-sub">AI Lead Intelligence</div></div>
+  <div class="pills"><div class="pill" id="hProfile">No Profile</div><div class="pill" id="hContacts">0 Contacts</div></div>
+</header>
+<div class="tabs">
+  <button class="tab on" onclick="goTab('profile')">① Profile</button>
+  <button class="tab" onclick="goTab('scan')">② Scan</button>
+  <button class="tab" onclick="goTab('results')">③ Results</button>
+</div>
+<div class="panel on" id="tab-profile">
+  <div class="sh">Company Profile</div>
+  <div class="profile-active" id="profileActive"></div>
+  <div class="fg" style="margin-bottom:16px;">
+    <label>Website URL — AI auto-fills your profile</label>
+    <div style="display:flex;gap:8px;"><input type="text" id="websiteUrl" placeholder="https://yourcompany.com"><button class="btn y" id="analyzeBtn" onclick="analyzeWebsite()">Analyze</button></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;margin:16px 0;color:#2a2a2a;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;"><div style="flex:1;height:1px;background:#1e1e1e;"></div>or fill manually<div style="flex:1;height:1px;background:#1e1e1e;"></div></div>
+  <div class="fg"><label>Company Name *</label><input type="text" id="m-co" placeholder="SumX AI Inc"></div>
+  <div class="fg"><label>What you sell *</label><textarea id="m-offer" placeholder="e.g. AI-powered ERP for GovCon subcontractors..."></textarea></div>
+  <div class="fg"><label>Ideal customer *</label><textarea id="m-icp" placeholder="e.g. BD directors, program managers at GovCon firms..."></textarea></div>
+  <div class="fg"><label>Deal killers (optional)</label><textarea id="m-bad" placeholder="e.g. Commercial-only companies, no gov work..."></textarea></div>
+  <button class="btn y" onclick="saveManual()">Save Profile</button>
+  <div class="disclaimer"><strong>Data Notice:</strong> By using CardScan Pro you acknowledge that contact information extracted from scanned business cards may be collected and used for lead generation purposes. Only extracted text data is collected — uploaded images are never stored. Use of this tool constitutes acceptance of these terms.</div>
+</div>
+<div class="panel" id="tab-scan">
+  <div class="sh">Scan Cards</div>
+  <div class="dz" id="dz"><input type="file" id="fi" accept="image/*" multiple><div style="font-size:36px;margin-bottom:10px;">🪪</div><div class="dz-title">Drop Cards Here</div><div class="dz-sub">JPG · PNG · WEBP · Any size — auto-compressed</div></div>
+  <div class="prog" id="pw"><div class="prog-bar" id="pb"></div></div>
+  <div class="ctrls"><button class="btn y" id="scanBtn" onclick="scanAll()" disabled>▶ Scan All</button><button class="btn" id="clearBtn" onclick="clearQueue()" disabled>Clear</button><span id="qCount" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#444;margin-left:auto;"></span></div>
+  <div class="qgrid" id="qgrid"></div>
+  <div class="warn" id="noProfileWarn">⚠ No profile — scanning without lead scoring. <a onclick="goTab('profile')">Add profile →</a></div>
+</div>
+<div class="panel" id="tab-results">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+    <div class="sh" style="margin-bottom:0;">Results</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div class="vtog"><button class="vb on" id="vCards" onclick="setView('cards')">Cards</button><button class="vb" id="vTable" onclick="setView('table')">Table</button></div>
+      <button class="btn g" id="exportBtn" onclick="exportCSV()" disabled>↓ CSV</button>
+      <button class="btn r" id="clearResBtn" onclick="clearResults()" disabled>✕ Clear</button>
+    </div>
+  </div>
+  <div class="stats" id="statsRow"><div class="stats-row">
+    <div class="stat"><div class="sn" id="sTotal" style="color:#e8c547">0</div><div class="sl">Total</div></div>
+    <div class="stat"><div class="sn" id="sHot" style="color:#2ecc71">0</div><div class="sl">Hot 8-10</div></div>
+    <div class="stat"><div class="sn" id="sWarm" style="color:#e8c547">0</div><div class="sl">Warm 5-7</div></div>
+    <div class="stat"><div class="sn" id="sEmail">0</div><div class="sl">Email</div></div>
+    <div class="stat"><div class="sn" id="sAvg">—</div><div class="sl">Avg Score</div></div>
+  </div></div>
+  <div id="resultsBox"><div class="empty">No contacts yet — scan some cards first</div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const S={profile:null,queue:[],contacts:[],view:'cards'};
+const FIELDS=[{k:'first_name',l:'First Name'},{k:'last_name',l:'Last Name'},{k:'title',l:'Title'},{k:'company',l:'Company'},{k:'email',l:'Email'},{k:'phone',l:'Phone'},{k:'mobile',l:'Mobile'},{k:'website',l:'Website'},{k:'linkedin',l:'LinkedIn'},{k:'address',l:'Address'},{k:'city',l:'City'},{k:'state',l:'State'},{k:'zip',l:'ZIP'},{k:'country',l:'Country'},{k:'notes',l:'Notes'},{k:'lead_score',l:'Score'},{k:'score_reason',l:'Reason'}];
+async function callAPI(messages){const r=await fetch('/api/scan',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Server error');const txt=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();if(!txt)throw new Error('Empty response');return txt;}
+function parseJSON(str){str=str.replace(/```json/gi,'').replace(/```/g,'').trim();const s=str.indexOf('{'),e=str.lastIndexOf('}');if(s<0||e<0)throw new Error('No JSON');return JSON.parse(str.slice(s,e+1));}
+function goTab(n){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',['profile','scan','results'][i]===n));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('tab-'+n).classList.add('on');if(n==='scan')document.getElementById('noProfileWarn').style.display=S.profile?'none':'block';}
+async function analyzeWebsite(){const url=document.getElementById('websiteUrl').value.trim();if(!url)return toast('Enter a URL first','err');const btn=document.getElementById('analyzeBtn');btn.textContent='Analyzing...';btn.disabled=true;try{const txt=await callAPI([{role:'user',content:'Analyze this company and return ONLY JSON (no markdown):
+
+Website: '+url+'
+
+{"company_name":"","summary":"2 sentences what they do","ideal_customer":"perfect B2B lead description","deal_killers":"who is NOT a good lead","scoring_context":"context for scoring leads 1-10"}'}]);const d=parseJSON(txt);S.profile=d;document.getElementById('m-co').value=d.company_name||'';document.getElementById('m-offer').value=d.summary||'';document.getElementById('m-icp').value=d.ideal_customer||'';document.getElementById('m-bad').value=d.deal_killers||'';setProfileActive(d.company_name);toast('Profile built — go to ② Scan','ok');}catch(e){toast('Failed: '+e.message,'err');}btn.textContent='Analyze';btn.disabled=false;}
+function saveManual(){const co=document.getElementById('m-co').value.trim();const offer=document.getElementById('m-offer').value.trim();const icp=document.getElementById('m-icp').value.trim();if(!co||!offer||!icp)return toast('Fill Company, Services, and Ideal Customer','err');S.profile={company_name:co,summary:offer,ideal_customer:icp,deal_killers:document.getElementById('m-bad').value.trim(),scoring_context:co+': '+offer+'. Ideal: '+icp+'. Not: '+document.getElementById('m-bad').value.trim()};setProfileActive(co);toast('Profile saved — go to ② Scan','ok');}
+function setProfileActive(name){const el=document.getElementById('profileActive');el.style.display='block';el.textContent='✓ '+name+' — profile active';document.getElementById('hProfile').textContent=name;document.getElementById('hProfile').classList.add('on');}
+const dz=document.getElementById('dz'),fi=document.getElementById('fi');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');addFiles(Array.from(e.dataTransfer.files));});
+fi.addEventListener('change',()=>{addFiles(Array.from(fi.files));fi.value='';});
+function addFiles(files){const imgs=files.filter(f=>f.type.startsWith('image/'));if(!imgs.length)return toast('No images found','err');imgs.forEach(file=>{const id=crypto.randomUUID();compress(file).then(url=>{S.queue.push({id,dataUrl:url,status:'pending'});renderQ();}).catch(()=>toast('Failed: '+file.name,'err'));});}
+function compress(file){return new Promise((res,rej)=>{const reader=new FileReader();reader.onerror=rej;reader.onload=e=>{const img=new Image();img.onerror=rej;img.onload=()=>{const MAX=1400;let{width:w,height:h}=img;if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',0.82));};img.src=e.target.result;};reader.readAsDataURL(file);});}
+function renderQ(){const g=document.getElementById('qgrid');g.innerHTML='';S.queue.forEach(item=>{const d=document.createElement('div');d.className='thumb';d.id='th-'+item.id;d.innerHTML='<img src="'+item.dataUrl+'"><div class="ts '+item.status+'">'+item.status+'</div>'+(item.status==='pending'?'<button class="tr" onclick="removeQ(''+item.id+'')">✕</button>':'');g.appendChild(d);});const p=S.queue.filter(i=>i.status==='pending').length;document.getElementById('qCount').textContent=S.queue.length?S.queue.length+' card'+(S.queue.length>1?'s':'')+' queued':'';document.getElementById('scanBtn').disabled=p===0;document.getElementById('clearBtn').disabled=S.queue.length===0;}
+function removeQ(id){S.queue=S.queue.filter(i=>i.id!==id);renderQ();}
+function clearQueue(){S.queue=[];renderQ();}
+function setQS(id,status){const item=S.queue.find(i=>i.id===id);if(item)item.status=status;const th=document.getElementById('th-'+id);if(!th)return;const b=th.querySelector('.ts');if(b){b.className='ts '+status;b.textContent=status;}const r=th.querySelector('.tr');if(r)r.remove();}
+async function scanAll(){const pending=S.queue.filter(i=>i.status==='pending');if(!pending.length)return;document.getElementById('scanBtn').disabled=true;const pw=document.getElementById('pw');pw.style.display='block';const pb=document.getElementById('pb');pb.style.width='0%';let done=0;for(const item of pending){setQS(item.id,'processing');try{const contact=await processCard(item.dataUrl);contact._id=item.id;S.contacts.push(contact);setQS(item.id,'done');}catch(e){setQS(item.id,'error');toast('Error: '+e.message,'err');}done++;pb.style.width=Math.round(done/pending.length*100)+'%';}setTimeout(()=>pw.style.display='none',400);renderResults();updateStats();document.getElementById('hContacts').textContent=S.contacts.length+' Contact'+(S.contacts.length!==1?'s':'');document.getElementById('scanBtn').disabled=false;if(S.contacts.length){toast('Done — '+done+' card'+(done>1?'s':'')+' scanned','ok');goTab('results');}}
+async function processCard(dataUrl){const base64=dataUrl.split(',')[1];const mime=(dataUrl.match(/data:(image/[^;]+);/)||[])[1]||'image/jpeg';const scoring=S.profile?'
+
+LEAD SCORING:
+Company: '+S.profile.company_name+'
+Services: '+S.profile.summary+'
+Ideal customer: '+S.profile.ideal_customer+'
+Deal killers: '+S.profile.deal_killers+'
+Score 1-10, set lead_score to integer, score_reason to one sentence.':'
+
+Set lead_score to 0 and score_reason to empty string.';const prompt='Extract ALL contact info from this business card.'+scoring+'
+
+Return ONLY JSON (no markdown):
+{"first_name":"","last_name":"","title":"","company":"","email":"","phone":"","mobile":"","website":"","linkedin":"","address":"","city":"","state":"","zip":"","country":"","notes":"","lead_score":0,"score_reason":""}';const txt=await callAPI([{role:'user',content:[{type:'image',source:{type:'base64',media_type:mime,data:base64}},{type:'text',text:prompt}]}]);const parsed=parseJSON(txt);const contact={};FIELDS.forEach(f=>{contact[f.k]=parsed[f.k]!==undefined?parsed[f.k]:'';});contact.lead_score=parseInt(parsed.lead_score)||0;return contact;}
+function setView(v){S.view=v;document.getElementById('vCards').classList.toggle('on',v==='cards');document.getElementById('vTable').classList.toggle('on',v==='table');renderResults();}
+function renderResults(){const box=document.getElementById('resultsBox');const has=S.contacts.length>0;document.getElementById('exportBtn').disabled=!has;document.getElementById('clearResBtn').disabled=!has;document.getElementById('statsRow').style.display=has?'block':'none';if(!has){box.innerHTML='<div class="empty">No contacts yet — scan some cards first</div>';return;}const sorted=[...S.contacts].sort((a,b)=>(b.lead_score||0)-(a.lead_score||0));if(S.view==='cards'){box.innerHTML='<div class="cgrid">'+sorted.map(cardHTML).join('')+'</div>';}else{let h='<div class="tw"><table><thead><tr><th>#</th>';FIELDS.forEach(f=>{h+='<th>'+f.l+'</th>';});h+='</tr></thead><tbody>';sorted.forEach((c,i)=>{h+='<tr><td style="color:#333;font-size:9px">'+(i+1)+'</td>';FIELDS.forEach(f=>{if(f.k==='lead_score'){const s=parseInt(c[f.k])||0;const col=s>=8?'#2ecc71':s>=5?'#e8c547':s>0?'#e74c3c':'#333';h+='<td style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:'+col+'">'+(s||'—')+'</td>';}else h+='<td title="'+esc(String(c[f.k]||''))+'">'+esc(String(c[f.k]||''))+'</td>';});h+='</tr>';});h+='</tbody></table></div>';box.innerHTML=h;}}
+function cardHTML(c){const s=parseInt(c.lead_score)||0;const cls=s>=8?'h':s>=5?'w':s>=3?'c':'l';return '<div class="cc">'+(s>0?'<div class="cc-score '+cls+'" style="float:right;margin-left:10px;"><div class="cc-score-n">'+s+'</div><div class="cc-score-l">Lead</div></div>':'')+'<div class="cc-name">'+esc(c.first_name)+' '+esc(c.last_name)+'</div><div class="cc-sub">'+[c.title,c.company].filter(Boolean).map(esc).join(' · ')+'</div>'+(c.score_reason&&s>0?'<div class="reason">'+esc(c.score_reason)+'</div>':'')+'<div class="cfields">'+(c.email?'<div class="cf wide"><div class="fl">Email</div><div class="fv">'+esc(c.email)+'</div></div>':'')+(c.phone?'<div class="cf"><div class="fl">Phone</div><div class="fv">'+esc(c.phone)+'</div></div>':'')+(c.mobile?'<div class="cf"><div class="fl">Mobile</div><div class="fv">'+esc(c.mobile)+'</div></div>':'')+(c.website?'<div class="cf wide"><div class="fl">Website</div><div class="fv">'+esc(c.website)+'</div></div>':'')+(c.city||c.state?'<div class="cf"><div class="fl">Location</div><div class="fv">'+[c.city,c.state].filter(Boolean).map(esc).join(', ')+'</div></div>':'')+(c.notes?'<div class="cf wide"><div class="fl">Notes</div><div class="fv">'+esc(c.notes)+'</div></div>':'')+'</div></div>';}
+function updateStats(){document.getElementById('sTotal').textContent=S.contacts.length;document.getElementById('sHot').textContent=S.contacts.filter(c=>(c.lead_score||0)>=8).length;document.getElementById('sWarm').textContent=S.contacts.filter(c=>{const s=c.lead_score||0;return s>=5&&s<8;}).length;document.getElementById('sEmail').textContent=S.contacts.filter(c=>c.email).length;const sc=S.contacts.filter(c=>c.lead_score>0);document.getElementById('sAvg').textContent=sc.length?(sc.reduce((a,c)=>a+(c.lead_score||0),0)/sc.length).toFixed(1):'—';}
+function clearResults(){S.contacts=[];renderResults();updateStats();document.getElementById('hContacts').textContent='0 Contacts';}
+function exportCSV(){if(!S.contacts.length)return;const sorted=[...S.contacts].sort((a,b)=>(b.lead_score||0)-(a.lead_score||0));const rows=[FIELDS.map(f=>f.l),...sorted.map(c=>FIELDS.map(f=>cell(c[f.k])))];const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('
+')],{type:'text/csv'}));a.download='cardscan_'+new Date().toISOString().slice(0,10)+'.csv';a.click();toast('CSV exported','ok');}
+function cell(v){if(!v&&v!==0)return'';v=String(v).replace(/"/g,'""');return v.includes(',')||v.includes('"')||v.includes('
+')?'"'+v+'"':v;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+let tt;
+function toast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast on'+(type?' '+type:'');clearTimeout(tt);tt=setTimeout(()=>{el.className='toast';},3500);}
+</script>
+</body>
+</html>
